@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Quiz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f0f2f5; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: #4a90e2; 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .stats { 
+            display: flex; 
+            gap: 20px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap;
+        }
+        .stat { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            flex: 1;
+            min-width: 100px;
+        }
+        .stat-number { font-size: 1.5em; font-weight: bold; color: #333; }
+        .question-card { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+        }
+        .question-text { font-size: 1.1em; margin-bottom: 15px; }
+        .answer-input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #ddd; 
+            border-radius: 5px; 
+            margin-bottom: 10px;
+        }
+        .choices { display: grid; gap: 10px; margin-bottom: 15px; }
+        .choice { 
+            padding: 10px; 
+            border: 2px solid #ddd; 
+            background: white; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .choice:hover { border-color: #4a90e2; }
+        .choice.selected { border-color: #4a90e2; background: #e3f2fd; }
+        .choice.correct { border-color: #4caf50; background: #e8f5e8; }
+        .choice.incorrect { border-color: #f44336; background: #fdeaea; }
+        .btn { 
+            background: #4a90e2; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        .btn:hover { background: #357abd; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .feedback { 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            font-weight: bold;
+        }
+        .feedback.correct { background: #e8f5e8; color: #2e7d32; }
+        .feedback.incorrect { background: #fdeaea; color: #c62828; }
+        .controls { text-align: center; margin-top: 20px; }
+        .difficulty { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 3px; 
+            font-size: 0.8em; 
+            margin-bottom: 10px;
+        }
+        .diff-1 { background: #4caf50; color: white; }
+        .diff-2 { background: #ff9800; color: white; }
+        .diff-3 { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ML Workflow Quiz</h1>
+        </div>
+        
+        <div class="content">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="total">0</div>
+                    <div>Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="correct">0</div>
+                    <div>Correct</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="score">0%</div>
+                    <div>Score</div>
+                </div>
+            </div>
+
+            <div id="questionArea">
+                <p style="text-align: center; color: #666;">Click Start to begin</p>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+                <button class="btn" onclick="showAnswer()" id="showBtn" style="display: none;">Show Answer</button>
+                <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none;">Next Question</button>
+                <button class="btn" onclick="resetQuiz()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1,
+                question: "What are the main phases of the ML workflow?",
+                type: "multiple",
+                options: ["Decision making, Data processing, Modeling, Deployment", "Planning, Execution, Testing, Maintenance", "Collection, Analysis, Training, Serving"],
+                correct: 0,
+                difficulty: 1
+            },
+            {
+                id: 2,
+                question: "What is the primary advantage of AutoML?",
+                type: "multiple",
+                options: ["Enables non-coders to develop ML models quickly", "Always produces better models", "Requires less computational resources"],
+                correct: 0,
+                difficulty: 1
+            },
+            {
+                id: 3,
+                question: "What is Exploratory Data Analysis (EDA)?",
+                type: "open",
+                answer: "EDA is a process to explore data structure, discover trends, patterns, and correlations between variables.",
+                difficulty: 1
+            },
+            {
+                id: 4,
+                question: "What are the 5 categories of ML problems?",
+                type: "multiple",
+                options: ["Regression, Classification, Clustering, Anomaly Detection, Reinforcement Learning", "Supervised, Unsupervised, Semi-supervised, Reinforcement, Deep Learning", "Linear, Non-linear, Tree-based, Neural Networks, Ensemble"],
+                correct: 0,
+                difficulty: 2
+            },
+            {
+                id: 5,
+                question: "What is feature engineering?",
+                type: "multiple",
+                options: ["Creating new features not in original dataset", "Removing irrelevant features", "Normalizing existing features"],
+                correct: 0,
+                difficulty: 2
+            }
+        ];
+
+        let currentQ = null;
+        let userAnswer = null;
+        let stats = { total: 0, correct: 0 };
+
+        function startQuiz() {
+            currentQ = questions[Math.floor(Math.random() * questions.length)];
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const area = document.getElementById('questionArea');
+            const diffClass = `diff-${currentQ.difficulty}`;
+            const diffText = ['Easy', 'Medium', 'Hard'][currentQ.difficulty - 1];
+            
+            let html = `
+                <div class="question-card">
+                    <div class="difficulty ${diffClass}">${diffText}</div>
+                    <div class="question-text">${currentQ.question}</div>
+            `;
+
+            if (currentQ.type === 'multiple') {
+                html += '<div class="choices">';
+                currentQ.options.forEach((option, i) => {
+                    html += `<div class="choice" onclick="selectChoice(${i})">${option}</div>`;
+                });
+                html += '</div>';
+            } else {
+                html += '<textarea class="answer-input" id="userInput" placeholder="Type your answer..."></textarea>';
+            }
+
+            html += '</div>';
+            area.innerHTML = html;
+
+            document.getElementById('showBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectChoice(index) {
+            document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.choice')[index].classList.add('selected');
+            userAnswer = index;
+        }
+
+        function showAnswer() {
+            const area = document.getElementById('questionArea');
+            const card = area.querySelector('.question-card');
+            let isCorrect = false;
+
+            if (currentQ.type === 'multiple') {
+                document.querySelectorAll('.choice').forEach((choice, i) => {
+                    if (i === currentQ.correct) choice.classList.add('correct');
+                    else if (i === userAnswer) choice.classList.add('incorrect');
+                });
+                isCorrect = userAnswer === currentQ.correct;
+            } else {
+                const input = document.getElementById('userInput').value;
+                isCorrect = input.length > 5; // Simple check
+            }
+
+            const feedback = `
+                <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                    ${isCorrect ? '✅ Correct!' : '❌ Incorrect.'}
+                    ${currentQ.type === 'open' ? `<br>Answer: ${currentQ.answer}` : ''}
+                </div>
+            `;
+            card.insertAdjacentHTML('beforeend', feedback);
+
+            stats.total++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+
+            document.getElementById('showBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            startQuiz();
+        }
+
+        function updateStats() {
+            document.getElementById('total').textContent = stats.total;
+            document.getElementById('correct').textContent = stats.correct;
+            document.getElementById('score').textContent = 
+                stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) + '%' : '0%';
+        }
+
+        function resetQuiz() {
+            stats = { total: 0, correct: 0 };
+            updateStats();
+            document.getElementById('questionArea').innerHTML = '<p style="text-align: center; color: #666;">Click Start to begin</p>';
+            document.getElementById('showBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
