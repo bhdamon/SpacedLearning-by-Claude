@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Enhanced ML Workflow Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .ai-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .quiz-container {
+            padding: 40px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4facfe;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-card.correct {
+            border-left-color: #4CAF50;
+            background: linear-gradient(to right, rgba(76, 175, 80, 0.1), transparent);
+        }
+
+        .question-card.incorrect {
+            border-left-color: #f44336;
+            background: linear-gradient(to right, rgba(244, 67, 54, 0.1), transparent);
+        }
+
+        .question-card.partial {
+            border-left-color: #ff9800;
+            background: linear-gradient(to right, rgba(255, 152, 0, 0.1), transparent);
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-1 { background: #4CAF50; color: white; }
+        .difficulty-2 { background: #FF9800; color: white; }
+        .difficulty-3 { background: #f44336; color: white; }
+
+        .question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+        }
+
+        .multiple-choice {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .choice-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .choice-btn.selected {
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        .choice-btn.correct {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .choice-btn.incorrect {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn.ai-scoring {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        }
+
+        .btn.ai-scoring:hover {
+            box-shadow: 0 8px 16px rgba(255, 107, 107, 0.4);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(76, 175, 80, 0.1);
+            color: #2E7D32;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(244, 67, 54, 0.1);
+            color: #C62828;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .feedback.partial {
+            background: rgba(255, 152, 0, 0.1);
+            color: #E65100;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .score-display {
+            font-size: 1.5em;
+            margin: 10px 0;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .score-excellent {
+            background: rgba(76, 175, 80, 0.2);
+            color: #2E7D32;
+        }
+
+        .score-good {
+            background: rgba(139, 195, 74, 0.2);
+            color: #558B2F;
+        }
+
+        .score-fair {
+            background: rgba(255, 152, 0, 0.2);
+            color: #E65100;
+        }
+
+        .score-poor {
+            background: rgba(244, 67, 54, 0.2);
+            color: #C62828;
+        }
+
+        .ai-feedback {
+            background: rgba(103, 58, 183, 0.1);
+            border: 1px solid rgba(103, 58, 183, 0.3);
+            color: #4A148C;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .ai-feedback h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .completion-message h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .quiz-container {
+                padding: 20px;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 AI-Enhanced ML Workflow Quiz</h1>
+            <p>Spaced Repetition Quiz with Intelligent Text Scoring</p>
+            <div class="ai-badge">🤖 AI-Powered Text Analysis</div>
+        </div>
+        
+        <div class="quiz-container">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalQuestions">0</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="correctAnswers">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgScore">0%</div>
+                    <div class="stat-label">Avg Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="streakCount">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="masteryLevel">0%</div>
+                    <div class="stat-label">Mastery</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div id="questionContainer"></div>
+
+            <div class="controls">
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+                <button class="btn ai-scoring" onclick="checkAnswerWithAI()" id="checkAnswerBtn" style="display: none;">
+                    <span id="checkBtnText">🤖 Check Answer with AI</span>
+                </button>
+                <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none;">Next Question</button>
+                <button class="btn" onclick="showAnswer()" id="showAnswerBtn" style="display: none;">Show Answer</button>
+                <button class="btn" onclick="markDifficulty(1)" id="easyBtn" style="display: none;">Easy (3 days)</button>
+                <button class="btn" onclick="markDifficulty(2)" id="mediumBtn" style="display: none;">Medium (1 day)</button>
+                <button class="btn" onclick="markDifficulty(3)" id="hardBtn" style="display: none;">Hard (1 hour)</button>
+                <button class="btn" onclick="resetQuiz()">Reset Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Question bank with spaced repetition metadata
+        const questionBank = [
+            {
+                id: 1,
+                question: "What are the 10 steps of the ML workflow mentioned in the chapter?",
+                type: "open",
+                answer: "1. Defining Business Objective/Problem Statement, 2. Data Collection, 3. Data Preprocessing, 4. Data Analysis (EDA), 5. Data Transformation, 6. Feature Selection, 7. Model Selection/AutoML, 8. Model Training/Evaluation/Tuning, 9. Model Testing, 10. Model Deployment, 11. Model Maintenance",
+                difficulty: 3,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 2,
+                question: "What are the 5 categories of ML problems mentioned in Table 1-1?",
+                type: "multiple",
+                options: [
+                    "Regression, Classification, Clustering, Anomaly Detection, Reinforcement Learning",
+                    "Supervised, Unsupervised, Semi-supervised, Reinforcement, Deep Learning",
+                    "Linear, Non-linear, Tree-based, Neural Networks, Ensemble",
+                    "Batch, Streaming, Real-time, Historical, Predictive"
+                ],
+                correct: 0,
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 3,
+                question: "What is the difference between structured, unstructured, and semi-structured data?",
+                type: "open",
+                answer: "Structured data has a defined format and schema (like databases), unstructured data has no defined format (like text, images, videos), and semi-structured data has some organizational properties but not a rigid schema (like JSON, XML).",
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 4,
+                question: "What is the primary advantage of AutoML according to the text?",
+                type: "multiple",
+                options: [
+                    "It enables anyone with domain knowledge but no coding experience to develop ML models quickly",
+                    "It always produces better models than manual approaches",
+                    "It requires less computational resources",
+                    "It works only with structured data"
+                ],
+                correct: 0,
+                difficulty: 1,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 5,
+                question: "In the umbrella sales example, what additional data dimensions were needed beyond selling price?",
+                type: "open",
+                answer: "Rainy seasons in specific regions, population density, inventory sufficiency, historical vs real-time data, and other factors that impact umbrella demand.",
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 6,
+                question: "What is the purpose of data normalization in preprocessing?",
+                type: "multiple",
+                options: [
+                    "To make it easier and faster to train an ML model by scaling numeric columns to a common scale",
+                    "To remove duplicate data entries",
+                    "To convert unstructured to structured data",
+                    "To increase the size of the dataset"
+                ],
+                correct: 0,
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 7,
+                question: "What is Exploratory Data Analysis (EDA)?",
+                type: "open",
+                answer: "EDA is a process used to explore and analyze the structure of data, looking to discover trends, patterns, feature relevance, and correlations between variables.",
+                difficulty: 1,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 8,
+                question: "What is feature engineering?",
+                type: "multiple",
+                options: [
+                    "Creating new features that were not in the original dataset",
+                    "Removing irrelevant features from the dataset",
+                    "Normalizing existing features",
+                    "Collecting more data features"
+                ],
+                correct: 0,
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 9,
+                question: "What are the three types of datasets used in model development and what is each used for?",
+                type: "open",
+                answer: "Training dataset (used to fit the model to the data), Validation dataset (used to improve model accuracy and prevent overfitting), Testing dataset (used to assess final model performance on unseen data).",
+                difficulty: 3,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 10,
+                question: "What is data drift in the context of model maintenance?",
+                type: "multiple",
+                options: [
+                    "Changes in the data that you trained with compared to the data now being received from the application",
+                    "The gradual decrease in model accuracy over time",
+                    "The process of moving data from one storage system to another",
+                    "The corruption of data during transmission"
+                ],
+                correct: 0,
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 11,
+                question: "What type of ML problem is customer churn prediction and why?",
+                type: "open",
+                answer: "Customer churn prediction is a supervised learning classification problem with two classes: 'Churn-Yes' and 'Churn-No', because we're predicting which category a customer falls into.",
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 12,
+                question: "What are the 4 main phases of the ML workflow?",
+                type: "multiple",
+                options: [
+                    "Decision making, Data processing, Modeling, Deployment",
+                    "Planning, Execution, Testing, Maintenance",
+                    "Collection, Analysis, Training, Serving",
+                    "Research, Development, Testing, Production"
+                ],
+                correct: 0,
+                difficulty: 1,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 13,
+                question: "Why is it important to define the business objective before data collection?",
+                type: "open",
+                answer: "Because you need to understand what kind of problem to solve or decision to make before knowing what kind of data to gather. The nature of the decision is tied directly to the data needed.",
+                difficulty: 2,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 14,
+                question: "What is the difference between batch and streaming data?",
+                type: "multiple",
+                options: [
+                    "Batch is historical data captured in groups, streaming is real-time data capture",
+                    "Batch is structured data, streaming is unstructured data",
+                    "Batch is for training, streaming is for testing",
+                    "Batch is local data, streaming is cloud data"
+                ],
+                correct: 0,
+                difficulty: 1,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            },
+            {
+                id: 15,
+                question: "What does a correlation matrix (heatmap) show in EDA?",
+                type: "open",
+                answer: "A correlation matrix shows the relationships between different variables/features, indicating how strongly one variable correlates with another (positive, negative, or no correlation).",
+                difficulty: 1,
+                nextReview: Date.now(),
+                interval: 1,
+                easeFactor: 2.5,
+                reviews: 0
+            }
+        ];
+
+        let currentQuestion = null;
+        let currentQuestionIndex = 0;
+        let userAnswer = '';
+        let showingAnswer = false;
+        let shuffledOptions = [];
+        let correctAnswerIndex = -1;
+        let lastScore = 0;
+        let stats = {
+            totalQuestions: 0,
+            correctAnswers: 0,
+            streakCount: 0,
+            masteryLevel: 0,
+            totalScore: 0,
+            avgScore: 0
+        };
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Shuffle multiple choice options and track correct answer position
+        function shuffleMultipleChoiceOptions(question) {
+            if (question.type !== 'multiple') return;
+            
+            // Create array of indices
+            const indices = question.options.map((_, index) => index);
+            const shuffledIndices = shuffleArray(indices);
+            
+            // Create shuffled options array
+            shuffledOptions = shuffledIndices.map(index => question.options[index]);
+            
+            // Find where the correct answer ended up
+            correctAnswerIndex = shuffledIndices.indexOf(question.correct);
+        }
+
+        // Spaced repetition algorithm (SM-2)
+        function updateSpacedRepetition(question, quality) {
+            if (quality >= 3) {
+                if (question.reviews === 0) {
+                    question.interval = 1;
+                } else if (question.reviews === 1) {
+                    question.interval = 6;
+                } else {
+                    question.interval = Math.round(question.interval * question.easeFactor);
+                }
+                question.nextReview = Date.now() + (question.interval * 24 * 60 * 60 * 1000);
+            } else {
+                question.reviews = 0;
+                question.interval = 1;
+                question.nextReview = Date.now() + (60 * 60 * 1000); // 1 hour
+            }
+            
+            question.easeFactor = question.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+            if (question.easeFactor < 1.3) question.easeFactor = 1.3;
+            question.reviews++;
+        }
+
+        function getDueQuestions() {
+            return questionBank.filter(q => q.nextReview <= Date.now());
+        }
+
+        function getNextQuestion() {
+            const dueQuestions = getDueQuestions();
+            if (dueQuestions.length === 0) {
+                return questionBank[Math.floor(Math.random() * questionBank.length)];
+            }
+            return dueQuestions[Math.floor(Math.random() * dueQuestions.length)];
+        }
+
+        function startQuiz() {
+            currentQuestion = getNextQuestion();
+            displayQuestion();
+            updateStats();
+        }
+
+        function displayQuestion() {
+            showingAnswer = false;
+            const container = document.getElementById('questionContainer');
+            
+            // Shuffle options for multiple choice questions
+            if (currentQuestion.type === 'multiple') {
+                shuffleMultipleChoiceOptions(currentQuestion);
+            }
+            
+            const difficultyClass = `difficulty-${currentQuestion.difficulty}`;
+            const difficultyText = currentQuestion.difficulty === 1 ? 'Easy' : 
+                                 currentQuestion.difficulty === 2 ? 'Medium' : 'Hard';
+            
+            let questionHTML = `
+                <div class="question-card">
+                    <div class="difficulty-badge ${difficultyClass}">${difficultyText}</div>
+                    <div class="question-text">${currentQuestion.question}</div>
+            `;
+
+            if (currentQuestion.type === 'multiple') {
+                questionHTML += '<div class="multiple-choice">';
+                shuffledOptions.forEach((option, index) => {
+                    questionHTML += `
+                        <button class="choice-btn" onclick="selectChoice(${index})" data-index="${index}">
+                            ${option}
+                        </button>
+                    `;
+                });
+                questionHTML += '</div>';
+                
+                document.getElementById('showAnswerBtn').style.display = 'inline-block';
+                document.getElementById('checkAnswerBtn').style.display = 'none';
+            } else {
+                questionHTML += `
+                    <textarea class="answer-input" id="userAnswer" placeholder="Type your detailed answer here..." rows="6"></textarea>
+                `;
+                
+                document.getElementById('showAnswerBtn').style.display = 'none';
+                document.getElementById('checkAnswerBtn').style.display = 'inline-block';
+            }
+
+            questionHTML += '</div>';
+            container.innerHTML = questionHTML;
+
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('easyBtn').style.display = 'none';
+            document.getElementById('mediumBtn').style.display = 'none';
+            document.getElementById('hardBtn').style.display = 'none';
+        }
+
+        function selectChoice(index) {
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-index="${index}"]`).classList.add('selected');
+            userAnswer = index;
+        }
+
+        async function checkAnswerWithAI() {
+            const userAnswerText = document.getElementById('userAnswer').value.trim();
+            
+            if (!userAnswerText) {
+                alert('Please enter an answer before checking.');
+                return;
+            }
+
+            // Show loading state
+            const checkBtn = document.getElementById('checkAnswerBtn');
+            const btnTextEl = document.getElementById('checkBtnText');
+            checkBtn.disabled = true;
+            btnTextEl.innerHTML = '<span class="loading-spinner"></span>Analyzing with AI...';
+
+            try {
+                const prompt = `
+                You are an AI tutor evaluating a student's answer to a machine learning question. 
+
+                QUESTION: ${currentQuestion.question}
+
+                CORRECT ANSWER: ${currentQuestion.answer}
+
+                STUDENT'S ANSWER: ${userAnswerText}
+
+                Please evaluate the student's answer and respond with ONLY a valid JSON object in this exact format:
+                {
+                    "score": [number from 0-100],
+                    "feedback": "Brief constructive feedback explaining the score",
+                    "strengths": "What the student got right",
+                    "improvements": "What could be improved or was missing"
+                }
+
+                Scoring guidelines:
+                - 90-100: Excellent, comprehensive answer covering all key points
+                - 75-89: Good answer covering most key points with minor gaps
+                - 60-74: Fair answer covering some key points but missing important details
+                - 40-59: Poor answer with significant gaps or misconceptions
+                - 0-39: Incorrect or completely off-topic
+
+                DO NOT include any text outside the JSON object. Your entire response must be valid JSON only.
+                `;
+
+                const response = await window.claude.complete(prompt);
+                
+                let aiResult;
+                try {
+                    aiResult = JSON.parse(response);
+                } catch (parseError) {
+                    console.error('JSON parsing failed:', parseError);
+                    // Fallback scoring
+                    aiResult = {
+                        score: calculateBasicSimilarity(userAnswerText, currentQuestion.answer),
+                        feedback: "AI analysis unavailable, using basic similarity scoring.",
+                        strengths: "Answer provided",
+                        improvements: "Consider including more specific details from the course material."
+                    };
+                }
+
+                displayAIFeedback(aiResult);
+                
+            } catch (error) {
+                console.error('AI scoring error:', error);
+                // Fallback to basic scoring
+                const fallbackScore = calculateBasicSimilarity(userAnswerText, currentQuestion.answer);
+                displayAIFeedback({
+                    score: fallbackScore,
+                    feedback: "AI analysis unavailable. Score based on keyword matching.",
+                    strengths: "Answer provided with effort",
+                    improvements: "Try to include more specific terms and concepts from the material."
+                });
+            }
+
+            // Reset button
+            checkBtn.
